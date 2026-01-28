@@ -27,24 +27,6 @@
       </swiper>
     </div>
     <div class="event-products-box">
-      <h2>현재 진행중인 <span>이벤트 특가</span> 상품</h2>
-      <div class="event-products-container">
-        <router-link
-          :to="`/product?id=${item.productId}`"
-          v-for="(item, index) in eventProductDatas"
-          :key="index"
-        >
-          <img :src="item.productThumbnailUrl.originalUrl" />
-          <p class="name">{{ item.productName }}</p>
-          <p class="price">
-            {{ item.productBankSellPrice.toLocaleString() }}원 ({{
-              item.productSellPrice.toLocaleString()
-            }}원)
-          </p>
-        </router-link>
-      </div>
-    </div>
-    <div class="event-products-box">
       <h2>새로 출시된 <span>따끈따끈한</span> 신상품</h2>
       <div class="event-products-container">
         <router-link
@@ -107,22 +89,11 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 const topBannerDatas = ref([]);
-const eventProductDatas = ref([]);
 const newProductDatas = ref([]);
 const saleDatasByCategory = ref({});
-const mainNewsDatas = ref([]);
 
 const saleCategoryIds = [
-  "97",
-  "49",
-  "50",
-  "51",
-  "52",
-  "58",
-  "59",
-  "70",
-  "76",
-  "84"
+  "1",
 ];
 
 onMounted(async () => {
@@ -131,29 +102,6 @@ onMounted(async () => {
         const topBanner = await getDocs(query(collection(db, "banners"), where("category", "==", "MAIN_TOP_BANNER"), orderBy("order", "asc")));
         topBannerDatas.value = topBanner.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         console.log("Top Banner Data Fetched Successfully!: ", topBannerDatas.value);
-
-        console.log("Fetching Main News Data...");
-        const mainNewsSnap = await getDocs(query(collection(db, "mainNews"), orderBy("createdAt", "desc"), limit(2)));
-        mainNewsDatas.value = mainNewsSnap.docs.map(doc => ({
-          id: doc.id,
-         ...doc.data()
-        }));
-        console.log("Main News Data Fetched Successfully!: ", mainNewsDatas.value);
-
-        console.log("Fetching Event Product Data...");
-        const eventProductSnap = await getDocs(query(
-          collection(db, "product"),
-          where("isActive", "==", true),
-          where("productCategory", "array-contains", "43"),
-          orderBy("popularScore", "desc"),
-          orderBy("createdAt", "desc"),
-          limit(6)
-        ));
-        eventProductDatas.value = eventProductSnap.docs.map(doc => ({
-          id: doc.id,
-         ...doc.data()
-        }));
-        console.log("Event Product Data Fetched Successfully!: ", eventProductDatas.value);
 
         console.log("Fetching New Product Data...");
         const newProductSnap = await getDocs(query(

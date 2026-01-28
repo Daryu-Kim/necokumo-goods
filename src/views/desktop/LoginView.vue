@@ -18,16 +18,6 @@
           <input
             type="radio"
             v-model="role"
-            id="salesperson"
-            name="role"
-            value="salesperson"
-          />
-          <label for="salesperson">영업자</label>
-        </div>
-        <div>
-          <input
-            type="radio"
-            v-model="role"
             id="admin"
             name="role"
             value="admin"
@@ -225,9 +215,6 @@ const login = async () => {
       switch (role.value) {
         case "consumer":
           window.location.href = "/";
-          break;
-        case "salesperson":
-          window.location.href = "/salesperson";
           break;
         case "admin":
           window.location.href = "/admin";

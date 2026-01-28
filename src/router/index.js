@@ -293,34 +293,6 @@ router.beforeEach((to, from, next) => {
 });
 
 router.beforeEach(async (to, from, next) => {
-  if (to.matched.some((record) => record.meta.requiresAuthSalesperson)) {
-    const user = getUserId();
-    if (user) {
-      try {
-        const userDocs = await getDocs(
-          query(collection(db, "salespersons"), where("userId", "==", user))
-        );
-        if (userDocs.size > 0) {
-          next();
-        } else {
-          console.warn(`No document found for user ID: ${user}`);
-          alert("영업자만 접근할 수 있습니다.");
-          next({ path: "/" });
-        }
-      } catch (error) {
-        alert("영업자만 접근할 수 있습니다.");
-        next({ path: "/" });
-      }
-    } else {
-      alert("영업자 로그인 후 이용가능합니다.");
-      next({ path: "/login" });
-    }
-  } else {
-    next();
-  }
-});
-
-router.beforeEach(async (to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuthAdmin)) {
     const user = getUserId();
     if (user) {

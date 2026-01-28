@@ -185,10 +185,6 @@ onMounted(async () => {
         editable: false,
       },
       {
-        content: item.userSalespersonCode,
-        editable: false,
-      },
-      {
         content: formatDate(item.visitedAt.toDate()),
         editable: false,
       },
@@ -242,13 +238,6 @@ onMounted(async () => {
         editable: false,
         resizable: false,
         width: 96,
-        align: "center",
-      },
-      {
-        name: "영업자 코드",
-        editable: false,
-        resizable: false,
-        width: 112,
         align: "center",
       },
       {

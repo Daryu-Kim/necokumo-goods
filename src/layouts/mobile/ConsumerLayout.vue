@@ -94,7 +94,7 @@ onMounted(async () => {
     > .home-btn {
       height: 36px;
       > img {
-        width: 72px;
+        height: 100%;
       }
     }
   }

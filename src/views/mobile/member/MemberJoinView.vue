@@ -65,6 +65,10 @@
       </div>
       <div class="join-container">
         <h3>기본 로그인 정보 입력</h3>
+        <div class="input-container">
+          <p>이름<span>*</span></p>
+          <input type="text" v-model="nameText" :disabled="isBusy" />
+        </div>
         <div class="input-container rrn">
           <p>휴대폰 번호<span>*</span></p>
           <div>
@@ -129,54 +133,6 @@
             @input="validatePassword2"
           />
           <p class="error" v-if="password2Error">{{ password2Error }}</p>
-        </div>
-        <hr class="sub" />
-        <h3>가입자 본인인증</h3>
-        <img src="@/assets/resident_guide.png" />
-        <div class="input-container">
-          <p>이름<span>*</span></p>
-          <input
-            type="text"
-            v-model="verifyNameText"
-            :disabled="isVerified || isBusy"
-            placeholder="①번 항목"
-          />
-        </div>
-        <div class="input-container rrn">
-          <p>주민등록번호<span>*</span></p>
-          <div>
-            <input
-              type="text"
-              v-model="verifyRrn1Text"
-              maxlength="6"
-              :disabled="isVerified || isBusy"
-              placeholder="②번 항목"
-              @input="(e) => onlyNumber(e, 'verifyRrn1Text')"
-            />
-            <p>-</p>
-            <input
-              type="password"
-              v-model="verifyRrn2Text"
-              maxlength="7"
-              :disabled="isVerified || isBusy"
-              placeholder="③번 항목"
-              @input="(e) => onlyNumber(e, 'verifyRrn2Text')"
-            />
-          </div>
-        </div>
-        <div class="input-container">
-          <p>발급일자<span>*</span></p>
-          <input
-            type="date"
-            v-model="verifyIssueDate"
-            :disabled="isVerified || isBusy"
-          />
-        </div>
-        <!-- goto -->
-        <div class="input-container">
-          <button :disabled="isVerified || isBusy" @click="handleCheckAdult">
-            위의 정보로 본인 확인하기
-          </button>
         </div>
         <hr class="sub" />
         <h3>기본 배송지 정보 입력</h3>
@@ -265,28 +221,6 @@
           />
         </div>
         <hr class="sub" />
-        <h3>영업자 정보 입력</h3>
-        <div class="input-container rrn">
-          <p>영업자 코드 (선택)</p>
-          <div>
-            <input
-              type="text"
-              v-model="salespersonCodeText"
-              :disabled="isCheckedSalespersonCode || isBusy"
-              maxlength="8"
-              placeholder="예) NKS00000"
-              @input="(e) => onlyNumberAndUpper(e, 'salespersonCodeText')"
-            />
-            <button
-              class="side-button"
-              @click="checkSalesPersonCode"
-              :disabled="isCheckedSalespersonCode || isBusy"
-            >
-              영업자 확인
-            </button>
-          </div>
-        </div>
-        <hr class="sub" />
         <div class="button-container">
           <button @click="router.go('/')" :disabled="isBusy">취소</button>
           <button @click="nextStep" :disabled="isBusy">회원가입</button>
@@ -315,7 +249,6 @@
 <script setup>
 import { db } from "@/lib/firebase";
 import {
-  arrayUnion,
   collection,
   doc,
   getDoc,
@@ -323,22 +256,15 @@ import {
   query,
   setDoc,
   Timestamp,
-  updateDoc,
   where,
 } from "firebase/firestore";
 import { Icon } from "@vicons/utils";
 import { CloseRound } from "@vicons/material";
-import { nextTick, onMounted, ref } from "vue";
+import { nextTick, ref } from "vue";
 import router from "@/router";
-import {
-  convertRRNtoDate,
-  generateUUIDFromSeed,
-  isOverYear20,
-} from "@/lib/utils";
+import { generateUUIDFromSeed } from "@/lib/utils";
 import { encrypt } from "@/lib/crypto";
-import { checkResidentCard } from "@/lib/apick";
 import { loginProcess } from "@/lib/auth";
-import { useRoute } from "vue-router";
 
 const isBusy = ref(false);
 
@@ -357,14 +283,7 @@ const password2Text = ref("");
 const passwordError = ref("");
 const password2Error = ref("");
 
-const verifyNameText = ref("");
-// 주민등록증
-const verifyRrn1Text = ref("");
-const verifyRrn2Text = ref("");
-const verifyIssueDate = ref("2025-01-01");
-
-const isVerified = ref(false);
-const verifiedInfo = ref({});
+const nameText = ref("");
 
 const postCodeText = ref("");
 const address1Text = ref("");
@@ -373,9 +292,6 @@ const address2Text = ref("");
 const bankNameText = ref("");
 const bankAccountNumberText = ref("");
 const bankDepositorNameText = ref("");
-
-const salespersonCodeText = ref("");
-const isCheckedSalespersonCode = ref(false);
 
 const checks = ref({
   terms: false,
@@ -390,31 +306,10 @@ const onlyNumber = (e, refName) => {
     phone1Text,
     phone2Text,
     phone3Text,
-    verifyRrn1Text,
-    verifyRrn2Text,
     bankAccountNumberText,
   }[refName];
 
   const value = e.target.value.replace(/\D/g, "");
-  targetRef.value = value;
-  e.target.value = value;
-};
-
-const onlyNumberAndUpper = (e, refName) => {
-  const targetRef = {
-    salespersonCodeText,
-  }[refName];
-
-  // 1. 입력값 가져오기
-  let value = e.target.value;
-
-  // 2. 소문자를 대문자로 변환
-  value = value.toUpperCase();
-
-  // 3. 영문 대문자와 숫자만 남기기
-  value = value.replace(/[^A-Z0-9]/g, "");
-
-  // 4. ref와 input에 값 반영
   targetRef.value = value;
   e.target.value = value;
 };
@@ -489,61 +384,6 @@ const handleCheckPhoneNumber = async () => {
   }
 };
 
-const handleCheckAdult = async () => {
-  try {
-    isBusy.value = true;
-    let result = {};
-
-    if (
-      !verifyNameText.value ||
-      verifyRrn1Text.value.length !== 6 ||
-      verifyRrn2Text.value.length !== 7
-    ) {
-      alert("주민등록증 정보를 입력해주세요!");
-      isBusy.value = false;
-      return;
-    }
-
-    const formattedDate = verifyIssueDate.value.replaceAll("-", "");
-
-    result = await checkResidentCard({
-      name: verifyNameText.value,
-      rrn1: verifyRrn1Text.value,
-      rrn2: verifyRrn2Text.value,
-      date: formattedDate,
-    });
-
-    if (result.data.result !== 1) {
-      alert("주민등록증 조회에 실패했습니다!");
-      isVerified.value = false;
-      isBusy.value = false;
-      return;
-    }
-
-    if (!isOverYear20(verifyRrn1Text.value)) {
-      alert("20세 미만의 청소년은 가입이 불가합니다!");
-      isVerified.value = false;
-      isBusy.value = false;
-      return;
-    }
-
-    verifiedInfo.value = {
-      type: result.data.type,
-      ic_id: result.data.ic_id,
-      pl_id: result.api.pl_id,
-      verifiedTimestamp: Timestamp.fromDate(new Date()),
-    };
-
-    alert("신분증 인증이 완료되었습니다!");
-    isVerified.value = true;
-    isBusy.value = false;
-  } catch (e) {
-    console.error(e);
-    isVerified.value = false;
-    isBusy.value = false;
-  }
-};
-
 const openDaumPostcode = () => {
   new window.daum.Postcode({
     oncomplete: (data) => {
@@ -570,39 +410,6 @@ const openDaumPostcode = () => {
   }).open();
 };
 
-const checkSalesPersonCode = async () => {
-  try {
-    isBusy.value = true;
-
-    if (salespersonCodeText.value.length === 0) {
-      alert("영업자 코드를 입력해주세요!");
-      isBusy.value = false;
-      return;
-    }
-
-    const salespersonDocs = await getDocs(
-      query(
-        collection(db, "salespersons"),
-        where("salespersonId", "==", salespersonCodeText.value)
-      )
-    );
-
-    if (salespersonDocs.empty) {
-      alert("해당하는 영업자가 없습니다!");
-      isBusy.value = false;
-      return;
-    }
-
-    alert("영업자가 확인되었습니다!");
-    isCheckedSalespersonCode.value = true;
-    isBusy.value = false;
-  } catch (e) {
-    console.error(e);
-    alert("영업자 코드 확인 중 오류가 발생했습니다!");
-    isBusy.value = false;
-  }
-};
-
 const nextStep = async () => {
   try {
     isBusy.value = true;
@@ -612,6 +419,12 @@ const nextStep = async () => {
 
     if (!allRequiredChecked) {
       alert("필수 항목을 모두 체크해주세요!");
+      isBusy.value = false;
+      return;
+    }
+
+    if (nameText.value === "") {
+      alert("이름을 입력해주세요!");
       isBusy.value = false;
       return;
     }
@@ -632,12 +445,6 @@ const nextStep = async () => {
       return;
     }
 
-    if (!isVerified.value) {
-      alert("본인 인증을 진행해주세요!");
-      isBusy.value = false;
-      return;
-    }
-
     if (postCodeText.value === "" || address1Text.value === "") {
       alert("주소를 입력해주세요!");
       isBusy.value = false;
@@ -653,24 +460,17 @@ const nextStep = async () => {
       isBusy.value = false;
       return;
     }
-
-    if (!isCheckedSalespersonCode.value) {
-      salespersonCodeText.value = "";
-    }
-
     const uuid = await generateUUIDFromSeed(
       `${phone1Text.value}${phone2Text.value}${phone3Text.value}`
     );
 
     await setDoc(doc(db, "users", uuid), {
       userId: uuid,
-      userName: verifyNameText.value,
+      userName: nameText.value,
       userPhone: `${phone1Text.value}${phone2Text.value}${phone3Text.value}`,
       userPassword: encrypt(passwordText.value),
-      userVerifiedInfo: encrypt(JSON.stringify(verifiedInfo.value)),
       userGrade: "N1",
       userMinGrade: "N1",
-      userBirthday: convertRRNtoDate(verifyRrn1Text.value),
       userPostCode: postCodeText.value,
       userAddress1: address1Text.value,
       userAddress2: address2Text.value,
@@ -679,7 +479,6 @@ const nextStep = async () => {
       userBankDepositorName: bankDepositorNameText.value,
       userCardNumber: "",
       userCardValidDate: null,
-      userSalespersonCode: salespersonCodeText.value,
       userProductCartList: [],
       userProductWishList: [],
       isAdmin: false,
@@ -691,12 +490,6 @@ const nextStep = async () => {
       visitedAt: Timestamp.fromDate(new Date()),
       createdAt: Timestamp.fromDate(new Date()),
     });
-
-    if (isCheckedSalespersonCode.value) {
-      await updateDoc(doc(db, "salespersons", salespersonCodeText.value), {
-        userIds: arrayUnion(uuid),
-      });
-    }
 
     await loginProcess(uuid);
 
@@ -722,26 +515,6 @@ const openDialog = async (docId) => {
 const closeDialog = () => {
   isDialogOpened.value = false;
 };
-
-onMounted(async () => {
-  const route = useRoute();
-  const id = route.query.id || "";
-
-  isBusy.value = true;
-
-  const salespersonDocs = await getDocs(
-    query(collection(db, "salespersons"), where("salespersonId", "==", id))
-  );
-
-  if (salespersonDocs.empty) {
-    isBusy.value = false;
-    return;
-  }
-
-  salespersonCodeText.value = id;
-  isCheckedSalespersonCode.value = true;
-  isBusy.value = false;
-});
 </script>
 
 <style lang="scss" scoped>

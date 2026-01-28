@@ -127,28 +127,6 @@
           </div>
         </div>
       </div>
-      <div>
-        <h4>영업자 정보</h4>
-        <div class="address-container">
-          <div>
-            <input
-              type="text"
-              v-model="salespersonCodeText"
-              :disabled="isCheckedSalespersonCode || isBusy"
-              maxlength="8"
-              placeholder="예) NKS00000"
-              @input="(e) => onlyNumberAndUpper(e, 'salespersonCodeText')"
-            />
-            <button
-              class="side-button"
-              @click="checkSalesPersonCode"
-              :disabled="isCheckedSalespersonCode || isBusy"
-            >
-              영업자 확인
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
     <div class="button-box">
       <button @click="nextStep" :disabled="isBusy">회원 정보 등록하기</button>
@@ -167,14 +145,12 @@ import {
 } from "@/lib/utils";
 import {
   addDoc,
-  arrayUnion,
   collection,
   doc,
   getDocs,
   query,
   setDoc,
   Timestamp,
-  updateDoc,
   where,
 } from "firebase/firestore";
 import { computed } from "vue";
@@ -204,9 +180,6 @@ const bankDepositorNameText = ref("");
 
 const recentPriceText = ref("0");
 
-const salespersonCodeText = ref("");
-const isCheckedSalespersonCode = ref(false);
-
 const phoneText = computed(() => {
   return `${phone1Text.value}${phone2Text.value}${phone3Text.value}`;
 });
@@ -221,25 +194,6 @@ const onlyNumber = (e, refName) => {
   }[refName];
 
   const value = e.target.value.replace(/\D/g, "");
-  targetRef.value = value;
-  e.target.value = value;
-};
-
-const onlyNumberAndUpper = (e, refName) => {
-  const targetRef = {
-    salespersonCodeText,
-  }[refName];
-
-  // 1. 입력값 가져오기
-  let value = e.target.value;
-
-  // 2. 소문자를 대문자로 변환
-  value = value.toUpperCase();
-
-  // 3. 영문 대문자와 숫자만 남기기
-  value = value.replace(/[^A-Z0-9]/g, "");
-
-  // 4. ref와 input에 값 반영
   targetRef.value = value;
   e.target.value = value;
 };
@@ -307,10 +261,6 @@ const nextStep = async () => {
       return;
     }
 
-    if (!isCheckedSalespersonCode.value) {
-      salespersonCodeText.value = "";
-    }
-
     const uuid = await generateUUIDFromSeed(phoneText.value);
     const tempPassword = generateTempPasswordCryptoJS(phoneText.value);
 
@@ -335,7 +285,6 @@ const nextStep = async () => {
       userBankDepositorName: bankDepositorNameText.value,
       userCardNumber: "",
       userCardValidDate: null,
-      userSalespersonCode: salespersonCodeText.value,
       userProductCartList: [],
       userProductWishList: [],
       isAdmin: false,
@@ -374,12 +323,6 @@ const nextStep = async () => {
         description: "기존 결제금액에 대한 포인트 지급",
         sourceType: "MANUAL_ADMIN",
         userId: uuid,
-      });
-    }
-
-    if (isCheckedSalespersonCode.value) {
-      await updateDoc(doc(db, "salespersons", salespersonCodeText.value), {
-        userIds: arrayUnion(uuid),
       });
     }
 
@@ -427,39 +370,6 @@ const openDaumPostcode = () => {
       });
     },
   }).open();
-};
-
-const checkSalesPersonCode = async () => {
-  try {
-    isBusy.value = true;
-
-    if (salespersonCodeText.value.length === 0) {
-      alert("영업자 코드를 입력해주세요!");
-      isBusy.value = false;
-      return;
-    }
-
-    const salespersonDocs = await getDocs(
-      query(
-        collection(db, "salespersons"),
-        where("salespersonId", "==", salespersonCodeText.value)
-      )
-    );
-
-    if (salespersonDocs.empty) {
-      alert("해당하는 영업자가 없습니다!");
-      isBusy.value = false;
-      return;
-    }
-
-    alert("영업자가 확인되었습니다!");
-    isCheckedSalespersonCode.value = true;
-    isBusy.value = false;
-  } catch (e) {
-    console.error(e);
-    alert("영업자 코드 확인 중 오류가 발생했습니다!");
-    isBusy.value = false;
-  }
 };
 </script>
 

@@ -136,7 +136,7 @@ export function generateTempPasswordCryptoJS(phone, opts = {}) {
 
   const suffix = randomLetters(randLen);
 
-  return `NK${tail}${suffix}!@`;
+  return `NKG${tail}${suffix}!@`;
 }
 
 export function convertUserGradeCodeToLabel(code) {
@@ -215,15 +215,15 @@ export function convertUserGradeCodeToPoint(code, price) {
 }
 
 export function convertPriceToUserGradeCode(price) {
-  if (price >= 0 && price <= 99999) {
+  if (price >= 0 && price <= 49999) {
     return "N1";
-  } else if (price >= 100000 && price <= 249999) {
+  } else if (price >= 50000 && price <= 149999) {
     return "N2";
-  } else if (price >= 250000 && price <= 499999) {
+  } else if (price >= 150000 && price <= 299999) {
     return "N3";
-  } else if (price >= 500000 && price <= 749999) {
+  } else if (price >= 300000 && price <= 499999) {
     return "N4";
-  } else if (price >= 750000 && price <= 999999) {
+  } else if (price >= 500000 && price <= 999999) {
     return "N5";
   } else if (price >= 1000000 && price <= 1499999) {
     return "N6";

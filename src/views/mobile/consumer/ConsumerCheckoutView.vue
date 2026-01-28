@@ -415,7 +415,6 @@ async function checkout() {
         returnReceivedAt: null,
         status: "BEFORE_PAYMENT",
         orderChannel: "NECOKUMO",
-        salespersonId: tempUserData.userSalespersonCode || "",
       });
     });
     await setDoc(doc(db, "order", orderId), {
@@ -440,7 +439,6 @@ async function checkout() {
       memoContent: "",
       cashReceiptNumber: "",
       cardReceiptNumber: "",
-      salespersonId: tempUserData.userSalespersonCode || "",
     });
 
     if (consumerAddressSave.value) {
@@ -555,7 +553,6 @@ async function checkoutCard() {
         returnReceivedAt: null,
         status: "BEFORE_PAYMENT",
         orderChannel: "NECOKUMO",
-        salespersonId: tempUserData.userSalespersonCode || "",
       });
     });
     await setDoc(doc(db, "order", orderId), {
@@ -580,7 +577,6 @@ async function checkoutCard() {
       memoContent: "",
       cashReceiptNumber: "",
       cardReceiptNumber: "",
-      salespersonId: tempUserData.userSalespersonCode || "",
     });
     await sendPpurioMessage({
       targets: [

@@ -2,11 +2,7 @@
   <div class="consumer-layout">
     <div class="main-header">
       <div class="header">
-        <a href="https://instagram.com/necokumo.shop" target="_blank"
-          >인스타그램</a
-        >
-        <a href="https://discord.gg/mGWqRdz4bN" target="_blank">디스코드</a>
-        <router-link to="/salesperson">영업자</router-link>
+        <a href="https://instagram.com/necokumo" target="_blank">인스타그램</a>
         <router-link to="/admin">관리자</router-link>
       </div>
       <hr />
@@ -70,7 +66,7 @@
     <footer>
       <div class="footer-content">
         <div>
-          <h2>네코쿠모</h2>
+          <h2>네코쿠모 굿즈샵</h2>
           <p class="f-info">회사명: 냥이네구름가게 / 대표자: 김원재</p>
           <p class="f-info">
             사업자등록번호: 228-15-02857 / 통신판매업 신고: 2025-대구남구-0495
@@ -83,23 +79,6 @@
           </p>
           <p class="f-cont">
             고객센터: 070-4047-4096 / 상담시간: 연중무휴 09:30 ~ 03:00
-          </p>
-        </div>
-        <div>
-          <p class="f-info">
-            19세 이미지와 "만 19세 미만 이용금지 이 사이트는 청소년에게 유해한
-            정보를 포함하고 있어 성인 인증 절차를 거쳐야합니다.
-          </p>
-          <p class="f-info">
-            이 사이트의 내용은 청소년 유해매체물로서 정보통신망 이용촉진 및
-            정보보호등에 관한 법률 및 청소년 보호법의 규정에 의하여 19세 미만의
-            청소년이 이용할 수 없습니다.
-          </p>
-          <p class="f-info">
-            신분증 도용 및 개인 정보 도용은 법적 처벌 대상입니다.
-          </p>
-          <p class="f-info">
-            신분증 및 개인 정보 도용 가입시 확인 후 무통보 탈퇴 처리됩니다.
           </p>
         </div>
       </div>
@@ -139,13 +118,13 @@ const route = useRoute();
 onMounted(async () => {
   console.log("Fetching Category Data...");
   const category = await getDocs(query(collection(db, "category"), where("categoryGrade", "==", 0), orderBy("categoryOrder", "asc")));
-  categoryDatas.value = category.docs.filter(doc => doc.id !== '1').map(doc => ({ id: doc.id,title: doc.data().categoryName }));
+  categoryDatas.value = category.docs.map(doc => ({ id: doc.id,title: doc.data().categoryName }));
   console.log("Category Data Fetched Successfully!: ", categoryDatas.value);
 
   if (route.query.category) {
     console.log("Fetching Sub Category Data...");
     const subCategory = await getDocs(query(collection(db, "category"), where("categoryParentId", "==", route.query.category), orderBy("categoryOrder", "asc")));
-    subCategoryDatas.value = subCategory.docs.filter(doc => doc.id !== '1').map(doc => ({ id: doc.id,title: doc.data().categoryName }));
+    subCategoryDatas.value = subCategory.docs.map(doc => ({ id: doc.id,title: doc.data().categoryName }));
     console.log("Sub Category Data Fetched Successfully!: ", subCategoryDatas.value);
   } else {
     subCategoryDatas.value = [];
@@ -183,7 +162,7 @@ watch(() => route.query.category, async (newVal, oldVal) => {
     if (route.query.category) {
       console.log("Fetching Sub Category Data...");
       const subCategory = await getDocs(query(collection(db, "category"), where("categoryParentId", "==", route.query.category), orderBy("categoryOrder", "asc")));
-      subCategoryDatas.value = subCategory.docs.filter(doc => doc.id !== '1').map(doc => ({ id: doc.id,title: doc.data().categoryName }));
+      subCategoryDatas.value = subCategory.docs.map(doc => ({ id: doc.id,title: doc.data().categoryName }));
       console.log("Sub Category Data Fetched Successfully!: ", subCategoryDatas.value);
     } else {
       subCategoryDatas.value = [];
@@ -232,10 +211,11 @@ watch(() => route.query.category, async (newVal, oldVal) => {
         align-items: center;
         justify-content: space-between;
         gap: 16px;
+        position: relative;
 
         > .home-btn {
           > img {
-            width: 128px;
+            width: 256px;
           }
         }
 
@@ -248,6 +228,10 @@ watch(() => route.query.category, async (newVal, oldVal) => {
           align-items: center;
           gap: 8px;
           height: 44px;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
 
           > input {
             flex: 1;
