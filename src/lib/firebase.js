@@ -5,11 +5,12 @@ import { getStorage } from "firebase/storage";
 const firebaseConfig = {
   apiKey: "AIzaSyAG2cDG6PmbcCAfz2oFEUH3QRduSbQOYd4",
   authDomain: "necokumo-goods.firebaseapp.com",
+  databaseURL: "https://necokumo-goods-default-rtdb.firebaseio.com",
   projectId: "necokumo-goods",
   storageBucket: "necokumo-goods.firebasestorage.app",
   messagingSenderId: "403797878076",
-  appId: "1:403797878076:web:00fc5a61d802c2402cea39",
-  measurementId: "G-E3Y7KJPN61",
+  appId: "1:403797878076:web:c2d04087f3f560d52cea39",
+  measurementId: "G-QDZYP45S3H",
 };
 
 const app = initializeApp(firebaseConfig);

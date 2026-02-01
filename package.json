@@ -1,5 +1,5 @@
 {
-  "name": "necokumo",
+  "name": "necokumo-goods",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -14,7 +14,7 @@
     "core-js": "^3.8.3",
     "crypto-js": "^4.2.0",
     "file-saver": "^2.0.5",
-    "firebase": "^11.8.0",
+    "firebase": "^12.8.0",
     "frappe-datatable": "^1.18.4",
     "jszip": "^3.10.1",
     "papaparse": "^5.5.3",

@@ -4,11 +4,11 @@ module.exports = defineConfig({
   pages: {
     index: {
       entry: "src/main.js",
-      title: "네코쿠모 - 프리미엄 전자담배 쇼핑몰",
+      title: "네코쿠모 굿즈샵 - 당신의 일상을 더 귀엽게",
     },
   },
   pwa: {
-    name: "네코쿠모",
+    name: "네코쿠모 굿즈샵 공식몰",
     themeColor: "#ffffff",
     backgroundColor: "#ffffff",
     display: "standalone",

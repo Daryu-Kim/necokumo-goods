@@ -94,6 +94,15 @@ const saleDatasByCategory = ref({});
 
 const saleCategoryIds = [
   "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
 ];
 
 onMounted(async () => {
